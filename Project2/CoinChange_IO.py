@@ -7,6 +7,30 @@ import sys
 
 
 
+def changeslow_rec(amount, coins, coinsUsed):
+    num_coins = 0
+    coinCount = len(coins)
+    for i in reversed(coins):
+        coinCount-=1
+        if amount == i:
+            coinsUsed[coinCount]+=1
+            num_coins = sum(coinsUsed)
+            return num_coins, coinsUsed
+    for i in reversed(coins):
+        coinCount-=1
+        if i < amount: #coin value is less than amount
+            coinsUsed[coinCount]+=1
+            amount = amount-i
+            changeslow_rec(amount, coins, coinsUsed)
+            num_coins = sum(coinsUsed)
+            return num_coins, coinsUsed
+    return num_coins, coinsUsed
+
+def changeslow(array, value):
+    coins = [0 for x in range(len(array))]
+    return changeslow_rec(value, array, coins)
+
+
 def changedp(array, value):
     coinCount = len(array)-1
     coins = [0 for x in range(coinCount+1)]
@@ -82,8 +106,13 @@ def main (importFile):
         while i < len(testArray):
             for x in range(len(testArray[i])):
                 NewFile.write("%d " % testArray[i][x])
-            #changeslow goes here:
-
+            NewFile.write('\n')
+            value = testArray[i+1]
+            m, coins = changeslow(testArray[i],value[0])
+            for x in range(len(coins)):
+                NewFile.write("%d " % coins[x])
+            NewFile.write('\n')
+            NewFile.write("%d" % m)
             NewFile.write('\n')
             i+=2
         NewFile.write('\n')

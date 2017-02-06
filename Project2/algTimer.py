@@ -5,6 +5,29 @@ from os import path
 import numpy as np
 import time
 
+def changeslow_rec(amount, coins, coinsUsed):
+    num_coins = 0
+    coinCount = len(coins)
+    for i in reversed(coins):
+        coinCount-=1
+        if amount == i:
+            coinsUsed[coinCount]+=1
+            num_coins = sum(coinsUsed)
+            return num_coins, coinsUsed
+    for i in reversed(coins):
+        coinCount-=1
+        if i < amount: #coin value is less than amount
+            coinsUsed[coinCount]+=1
+            amount = amount-i
+            changeslow_rec(amount, coins, coinsUsed)
+            num_coins = sum(coinsUsed)
+            return num_coins, coinsUsed
+    return num_coins, coinsUsed
+
+def changeslow(array, value):
+    coins = [0 for x in range(len(array))]
+    return changeslow_rec(value, array, coins)
+
 
 def changedp(array, value):
     coinCount = len(array)-1
@@ -50,30 +73,38 @@ outFile = "Time_Results.txt"
 NewFile = open(outFile, 'w')
 
 A=[]
-A.extend(range(2010,2210,10))
 
+#A is array of values to make change from.  modify below to change range( <start value>, <end value>, <increment>)
+A.extend(range(2000,2201,1))
 
-V = [1, 5, 10, 25, 50]
+# V is change array
+V = []
+V.extend(range(1,31))
+print(V)
 
-NewFile.write("slowchange:\n")
-#for i in range(len(testArray)):
+NewFile.write("changeslow:\n")
+for i in range(len(A)):
+    start = time.time()
+    m, coins = changeslow(V, A[i])
+    tTime = time.time() - start
+    NewFile.write("%d\t%f\t%d\n" % (A[i], tTime, m))
 
 
 NewFile.write('\n')
 NewFile.write("changegreedy:\n")
 for i in range(len(A)):
     start = time.time()
-    changegreedy(V, A[i])
+    m, coins = changegreedy(V, A[i])
     tTime = time.time() - start
-    NewFile.write("%f\n" % tTime)
+    NewFile.write("%d\t%f\t%d\n" % (A[i], tTime, m))
 
 NewFile.write('\n')
 NewFile.write("changedp:\n")
 for i in range(len(A)):
     start = time.time()
-    changedp(V, A[i])
+    m, coins = changedp(V, A[i])
     tTime = time.time() - start
-    NewFile.write("%f\n" % tTime)
+    NewFile.write("%d\t%f\t%d\n" % (A[i], tTime, m))
 
 
 NewFile.close()
