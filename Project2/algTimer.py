@@ -43,13 +43,6 @@ def changedp(array, value):
                 newCoin = j
             minCoin[x] = coinCount
             coinUsed[x] = newCoin
-    coinLoc = value
-    while coinLoc > 0:
-        coinVal = coinUsed[coinLoc]
-        for x in range(len(array)):
-            if (array[x] == coinVal):
-                coins[x]+=1
-        coinLoc -= coinVal
     return minCoin[value], coins
 
 def changegreedy(array, value):
@@ -75,12 +68,14 @@ NewFile = open(outFile, 'w')
 A=[]
 
 #A is array of values to make change from.  modify below to change range( <start value>, <end value>, <increment>)
-A.extend(range(2000,2201,1))
+A.extend(range(1,1001,1000))
 
 # V is change array
 V = []
-V.extend(range(1,31))
+V.extend(range(1,247,5))
 print(V)
+         
+
 
 NewFile.write("changeslow:\n")
 for i in range(len(A)):

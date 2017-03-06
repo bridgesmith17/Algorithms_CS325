@@ -1,0 +1,8 @@
+changeslow:
+1	0.000034	1
+
+changegreedy:
+1	0.000011	1
+
+changedp:
+1	0.000024	1
