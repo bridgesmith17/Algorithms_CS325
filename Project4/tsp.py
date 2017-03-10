@@ -11,11 +11,12 @@ def dist(pI, pII):
     out = math.sqrt((pI[0] - pII[0])**2 + (pI[1] - pII[1])**2)
     return int(round(out))
 
+#helper function to pass coordinates inside array to dist function
 def inDist(pI, pII):
     return dist(pI[1], pII[1])
 
-
-def tspHeuristic(pointsArray):
+#greedy path, uses list in order given to find the next closest location and add to path
+def tspNN(pointsArray):
     travelDist = 0
     start = pointsArray[0]
     visitPath = pointsArray
@@ -26,7 +27,81 @@ def tspHeuristic(pointsArray):
         travelDist += inDist(path[-1], next)
         path.append(next)
         visitPath.remove(next)
+    #add in final distance from last to first location
+    travelDist += inDist(path[0], path[-1])
     return path, travelDist
+
+def getDist(pointsArray):
+    i = 1
+    travelDist = 0
+    while i <= len(pointsArray)-1:
+        travelDist += inDist(pointsArray[i-1], pointsArray[i])
+        i+=1
+    travelDist += inDist(pointsArray[0], pointsArray[-1])
+    return travelDist
+
+def two_opt(pointsArray):
+    for i in range(len(pointsArray) - 1):
+        for j in range(i + 2, len(pointsArray) - 1):
+            if (inDist(pointsArray[i], pointsArray[i+1]) + inDist(pointsArray[j], pointsArray[j+1]) > inDist(pointsArray[i], pointsArray[j]) + inDist(pointsArray[i+1], pointsArray[j+1])):
+                pointsArray[i+1:j+1] = reversed(pointsArray[i+1:j+1])
+    dist = getDist(pointsArray)
+    return pointsArray, dist
+
+def three_opt(pointsArray):
+    for i in range(len(pointsArray) - 1):
+        for j in range(i + 2, len(pointsArray) - 1):
+            for k in range(j + 2, len(pointsArray) - 1):
+                way = 0
+                current = inDist(pointsArray[i], pointsArray[i + 1]) + inDist(pointsArray[j], pointsArray[j + 1]) + inDist(pointsArray[k], pointsArray[k + 1])
+                if current > inDist(pointsArray[i], pointsArray[i + 1]) + inDist(pointsArray[j], pointsArray[k]) + inDist(pointsArray[j + 1], pointsArray[k + 1]):
+                    current = inDist(pointsArray[i], pointsArray[i + 1]) + inDist(pointsArray[j], pointsArray[k]) + inDist(pointsArray[j + 1], pointsArray[k + 1])
+                    way = 1
+                if current > inDist(pointsArray[i], pointsArray[j]) + inDist(pointsArray[i + 1], pointsArray[j + 1]) + inDist(pointsArray[k], pointsArray[k + 1]):
+                    current = inDist(pointsArray[i], pointsArray[j]) + inDist(pointsArray[i + 1], pointsArray[j + 1]) + inDist(pointsArray[k], pointsArray[k + 1])
+                    way = 2
+                if current > inDist(pointsArray[i], pointsArray[j]) + inDist(pointsArray[i + 1], pointsArray[k]) + inDist(pointsArray[j + 1], pointsArray[k + 1]):
+                    current = inDist(pointsArray[i], pointsArray[j]) + inDist(pointsArray[i + 1], pointsArray[k]) + inDist(pointsArray[j + 1], pointsArray[k + 1])
+                    way = 3
+                if current > inDist(pointsArray[i], pointsArray[j + 1]) + inDist(pointsArray[k], pointsArray[i + 1]) + inDist(pointsArray[j], pointsArray[k + 1]):
+                    current = inDist(pointsArray[i], pointsArray[j + 1]) + inDist(pointsArray[k], pointsArray[i + 1]) + inDist(pointsArray[j], pointsArray[k + 1])
+                    way = 4
+                if current > inDist(pointsArray[i], pointsArray[j + 1]) + inDist(pointsArray[k], pointsArray[j]) + inDist(pointsArray[i + 1], pointsArray[k + 1]):
+                    current = inDist(pointsArray[i], pointsArray[j + 1]) + inDist(pointsArray[k], pointsArray[j]) + inDist(pointsArray[i + 1], pointsArray[k + 1])
+                    way = 5
+                if current > inDist(pointsArray[i], pointsArray[k]) + inDist(pointsArray[j + 1], pointsArray[i + 1]) + inDist(pointsArray[j], pointsArray[k + 1]):
+                    current = inDist(pointsArray[i], pointsArray[k]) + inDist(pointsArray[k], pointsArray[i + 1]) + inDist(pointsArray[j], pointsArray[k + 1])
+                    way = 6
+                if current > inDist(pointsArray[i], pointsArray[k]) + inDist(pointsArray[j + 1], pointsArray[j]) + inDist(pointsArray[i + 1], pointsArray[k + 1]):
+                    current = inDist(pointsArray[i], pointsArray[k]) + inDist(pointsArray[j + 1], pointsArray[j]) + inDist(pointsArray[i + 1], pointsArray[k + 1])
+                    way = 7
+                if way == 1:
+                    pointsArray[j + 1: k + 1] = reversed(pointsArray[j + 1: k + 1])
+                elif way == 2:
+                    pointsArray[i + 1: j + 1] = reversed(pointsArray[i + 1: j + 1])
+                elif way == 3:
+                    pointsArray[i + 1: j + 1], pointsArray[j + 1: k + 1] = reversed(pointsArray[i + 1: j + 1]), reversed(pointsArray[j + 1: k + 1])
+                elif way == 4:
+                    pointsArray = pointsArray[: i + 1] + pointsArray[j + 1: k + 1] + pointsArray[i + 1: j + 1] + pointsArray[k + 1: ]
+                elif way == 5:
+                    temp = pointsArray[: i + 1] + pointsArray[j + 1: k + 1]
+                    temp += reversed(pointsArray[i + 1: j + 1])
+                    temp += pointsArray[k + 1: ]
+                    pointsArray = temp
+                elif way == 6:
+                    temp = pointsArray[: i + 1]
+                    temp += reversed(pointsArray[j + 1: k + 1])
+                    temp += pointsArray[i + 1: j + 1]
+                    temp += pointsArray[k + 1: ]
+                    pointsArray = temp
+                elif way == 7:
+                    temp = pointsArray[: i + 1]
+                    temp += reversed(pointsArray[j + 1: k + 1])
+                    temp += reversed(pointsArray[i + 1: j + 1])
+                    temp += pointsArray[k + 1: ]
+                    pointsArray = temp
+    dist = getDist(pointsArray)
+    return pointsArray, dist
 
 
 def main (importFile):
@@ -47,9 +122,8 @@ def main (importFile):
         
         #time and call tsp function
         start = time.time()
-        tpsH, distance = tspHeuristic(tspArray)
+        tspF, distance = three_opt(tspArray)
         print(time.time()-start)
-        
         
         splt = importFile.split('.')
         outFile = ".tour"
@@ -61,8 +135,8 @@ def main (importFile):
                                 
         NewFile = open(outFile, 'w')
         NewFile.write("%d\n" % distance)
-        for x in range(len(tpsH)):
-            NewFile.write("%s\n" % tpsH[x][0])
+        for x in range(len(tspF)):
+            NewFile.write("%s\n" % tspF[x][0])
 
         NewFile.close()
 
