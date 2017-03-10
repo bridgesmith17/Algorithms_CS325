@@ -11,7 +11,22 @@ def dist(pI, pII):
     out = math.sqrt((pI[0] - pII[0])**2 + (pI[1] - pII[1])**2)
     return int(round(out))
 
+def inDist(pI, pII):
+    return dist(pI[1], pII[1])
 
+
+def tspHeuristic(pointsArray):
+    travelDist = 0
+    start = pointsArray[0]
+    visitPath = pointsArray
+    path = [start]
+    visitPath.remove(start)
+    while visitPath:
+        next = min(visitPath, key=lambda x: inDist(path[-1], x))
+        travelDist += inDist(path[-1], next)
+        path.append(next)
+        visitPath.remove(next)
+    return path, travelDist
 
 
 def main (importFile):
@@ -29,9 +44,13 @@ def main (importFile):
             tspArray.append(temp)
 
         testFile.close()
-
-        print (dist(tspArray[1][1], tspArray[2][1]))
-
+        
+        #time and call tsp function
+        start = time.time()
+        tpsH, distance = tspHeuristic(tspArray)
+        print(time.time()-start)
+        
+        
         splt = importFile.split('.')
         outFile = ".tour"
         outFile = importFile+outFile
@@ -41,7 +60,9 @@ def main (importFile):
             os.remove(outFile)
                                 
         NewFile = open(outFile, 'w')
-
+        NewFile.write("%d\n" % distance)
+        for x in range(len(tpsH)):
+            NewFile.write("%s\n" % tpsH[x][0])
 
         NewFile.close()
 
