@@ -5,6 +5,8 @@ import time
 import os
 import sys
 import math
+import random
+import copy
 
 #function returns the rounded distace between two points.
 def dist(pI, pII):
@@ -16,9 +18,9 @@ def inDist(pI, pII):
     return dist(pI[1], pII[1])
 
 #greedy path, uses list in order given to find the next closest location and add to path
-def tspNN(pointsArray):
+def tspNN(pointsArray, start):
     travelDist = 0
-    start = pointsArray[0]
+    start = pointsArray[start]
     visitPath = pointsArray
     path = [start]
     visitPath.remove(start)
@@ -104,6 +106,30 @@ def three_opt(pointsArray):
     return pointsArray, dist
 
 
+
+#uses tspNN function and adds a random start point to find the best path.
+def randScale(pointsArray):
+    min_dist= 100000000
+    n = len(pointsArray)-1
+    if n > 10000:
+        r = 5
+    elif n > 4000:
+        r = 10
+    elif n > 1000:
+        r = 20
+    elif n > 50:
+        r = 50
+    else:
+        r = n
+    for i in range(r):
+        x = random.randint(0,n)
+        pointsArray, dist = tspNN(pointsArray, x)
+        if (dist < min_dist):
+            min_dist = dist
+            min_array = copy.copy(pointsArray)
+        print (i)
+    return pointsArray, min_dist
+
 def main (importFile):
     #open test problem file and import
     if (path.isfile(importFile)):
@@ -122,7 +148,7 @@ def main (importFile):
         
         #time and call tsp function
         start = time.time()
-        tspF, distance = three_opt(tspArray)
+        tspF, distance = randScale(tspArray)
         print(time.time()-start)
         
         splt = importFile.split('.')
