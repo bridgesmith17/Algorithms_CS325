@@ -18,6 +18,7 @@ def inDist(pI, pII):
     return dist(pI[1], pII[1])
 
 #greedy path, uses list in order given to find the next closest location and add to path
+#based on :https://en.wikipedia.org/wiki/Nearest_neighbour_algorithm
 def tspNN(pointsArray, start):
     travelDist = 0
     start = pointsArray[start]
@@ -33,6 +34,7 @@ def tspNN(pointsArray, start):
     travelDist += inDist(path[0], path[-1])
     return path, travelDist
 
+#getDist loops though ordered array of tsp path to calcualted the total distance traveled
 def getDist(pointsArray):
     i = 1
     travelDist = 0
@@ -42,6 +44,8 @@ def getDist(pointsArray):
     travelDist += inDist(pointsArray[0], pointsArray[-1])
     return travelDist
 
+#two opt pulls checks and compares two the distance of two points and swaps if necessary to get the shortest path
+#based on: https://en.wikipedia.org/wiki/2-opt, https://github.com/ntrifunovic/TSP/blob/master/tsp.py
 def two_opt(pointsArray):
     for i in range(len(pointsArray) - 1):
         for j in range(i + 2, len(pointsArray) - 1):
@@ -50,6 +54,8 @@ def two_opt(pointsArray):
     dist = getDist(pointsArray)
     return pointsArray, dist
 
+#three opt similar to 2-opt checks three distances at a time to find the shortest path
+#based on: https://en.wikipedia.org/wiki/3-opt, https://github.com/ntrifunovic/TSP/blob/master/tsp.py
 def three_opt(pointsArray):
     for i in range(len(pointsArray) - 1):
         for j in range(i + 2, len(pointsArray) - 1):
@@ -107,7 +113,7 @@ def three_opt(pointsArray):
 
 
 
-#uses tspNN function and adds a random start point to find the best path.
+#uses tspNN function and adds a random start point to find the best path, varies number of random starts based on size of input to reduce time of operation
 def randScale(pointsArray):
     min_dist= 100000000
     n = len(pointsArray)-1
@@ -130,6 +136,8 @@ def randScale(pointsArray):
         print (i)
     return pointsArray, min_dist
 
+
+#main function reads input file with path, inserts into array and passes to tsp function.  It then creats output file of best path found by algorithm
 def main (importFile):
     #open test problem file and import
     if (path.isfile(importFile)):
